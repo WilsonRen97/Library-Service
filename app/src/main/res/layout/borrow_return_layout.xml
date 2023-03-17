@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/borrow_return_text"
+        android:textSize="40dp"
+        android:textAlignment="center"
+        android:textColor="@color/btn3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Borrow/Return Form" />
+
+    <EditText
+        android:id="@+id/bookISBN_for_borrow_return"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dp"
+        android:hint="Book ISBN" />
+
+    <EditText
+        android:id="@+id/userId_for_borrow_return"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dp"
+        android:hint="User ID" />
+
+    <Button
+        android:layout_marginTop="10dp"
+        android:id="@+id/borrowBtn"
+        android:textSize="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/btn3"
+        android:text="Borrow" />
+
+    <Button
+        android:layout_marginTop="10dp"
+        android:id="@+id/returnBtn"
+        android:textSize="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/btn2"
+        android:text="Return" />
+
+    <TextView
+        android:id="@+id/borrow_return_result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/black"
+        android:textSize="20dp"
+        android:textAlignment="center"
+        android:text="" />
+
+</LinearLayout>
