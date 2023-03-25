@@ -9,23 +9,18 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.wilsontryingapp2023.libraryservice.R
-import com.wilsontryingapp2023.libraryservice.roomDatabase.Book
 import com.wilsontryingapp2023.libraryservice.roomDatabase.User
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
-class UserRegisterActivity: AppCompatActivity() {
+class UserRegisterActivity : AppCompatActivity() {
 
     private lateinit var userName: EditText
     private lateinit var userID: EditText
     private lateinit var userRegisterBtn: Button
-    private lateinit var userRegisterResult : TextView
-    private var handler : Handler = Handler(Looper.myLooper()!!)
+    private lateinit var userRegisterResult: TextView
+    private var handler: Handler = Handler(Looper.myLooper()!!)
 
     companion object {
-        fun validationCheckForID(id : String) : Boolean {
+        fun validationCheckForID(id: String): Boolean {
             if (!id[0].isLetter()) {
                 return false
             }
@@ -121,25 +116,33 @@ class UserRegisterActivity: AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            runBlocking {
-                val scope = CoroutineScope(Dispatchers.Default)
-                withContext(scope.coroutineContext) {
-                    try {
-                        val userNameRegister = userName.text.toString()
-                        val userIDRegister = userID.text.toString()
-                        MainActivity.userDao!!.insertOneNewUser(User(userIDRegister, userNameRegister, null, null, null, null))
-                        handler.post{
-                            userRegisterResult.text = "The result is :\n Congrats!! The user has been registered."
-                            userName.setText("")
-                            userID.setText("")
-                        }
-                    } catch (e : Exception) {
-                        handler.post{
-                            userRegisterResult.text = "The result is :\n" + e.message
-                        }
+            MainActivity.thread.myHandler!!.post {
+                try {
+                    val userNameRegister = userName.text.toString()
+                    val userIDRegister = userID.text.toString()
+                    MainActivity.userDao!!.insertOneNewUser(
+                        User(
+                            userIDRegister,
+                            userNameRegister,
+                            null,
+                            null,
+                            null,
+                            null
+                        )
+                    )
+                    handler.post {
+                        userRegisterResult.text =
+                            "The result is :\n Congrats!! The user has been registered."
+                        userName.setText("")
+                        userID.setText("")
+                    }
+                } catch (e: Exception) {
+                    handler.post {
+                        userRegisterResult.text = "The result is :\n" + e.message
                     }
                 }
             }
+
         }
     }
 }

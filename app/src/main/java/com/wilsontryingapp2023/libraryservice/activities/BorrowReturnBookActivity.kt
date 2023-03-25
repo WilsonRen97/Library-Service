@@ -11,10 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.wilsontryingapp2023.libraryservice.R
 import com.wilsontryingapp2023.libraryservice.roomDatabase.Book
 import com.wilsontryingapp2023.libraryservice.roomDatabase.User
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 class BorrowReturnBookActivity : AppCompatActivity() {
 
@@ -125,114 +121,112 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            runBlocking {
-                val scope = CoroutineScope(Dispatchers.Default)
-                withContext(scope.coroutineContext) {
-                    try {
-                        // 找尋使用者
-                        val user = MainActivity.userDao!!.getUserById(userID)
-                        println("the found user is $user")
-                        if (user == null) {
-                            handler.post {
-                                borrow_return_result.text = "User not found. Borrow failed."
-                            }
-                            return@withContext
+            MainActivity.thread.myHandler!!.post {
+                try {
+                    // 找尋使用者
+                    val user = MainActivity.userDao!!.getUserById(userID)
+                    println("the found user is $user")
+                    if (user == null) {
+                        handler.post {
+                            borrow_return_result.text = "User not found. Borrow failed."
                         }
+                        return@post
+                    }
 
-                        // 找尋圖書
-                        val book = MainActivity.bookDao!!.getBookByISBN(isbn)
-                        if (book == null) {
-                            handler.post {
-                                borrow_return_result.text = "Book not found. Borrow failed."
-                            }
-                            return@withContext
+                    // 找尋圖書
+                    val book = MainActivity.bookDao!!.getBookByISBN(isbn)
+                    if (book == null) {
+                        handler.post {
+                            borrow_return_result.text = "Book not found. Borrow failed."
                         }
+                        return@post
+                    }
 
-                        // 如果使用者已經借了四本書，則不予以借書
-                        if (user.bookBorrowing1 != null && user.bookBorrowing2 != null && user.bookBorrowing3 != null && user.bookBorrowing4 != null) {
-                            handler.post {
-                                borrow_return_result.text =
-                                    "User have reach the book borrow limit. Borrow failed."
-                            }
-                            return@withContext
+                    // 如果使用者已經借了四本書，則不予以借書
+                    if (user.bookBorrowing1 != null && user.bookBorrowing2 != null && user.bookBorrowing3 != null && user.bookBorrowing4 != null) {
+                        handler.post {
+                            borrow_return_result.text =
+                                "User have reach the book borrow limit. Borrow failed."
                         }
+                        return@post
+                    }
 
-                        // 如果某本書已經借給某人，borrowedTo不是null，則代表這本書可能館員沒有刷還
-                        // 或者這個人是撿到這本書等等，須了解狀況後，再予以借書
-                        if (book.borrowedTo != null) {
-                            handler.post {
-                                borrow_return_result.text =
-                                    "The book is borrowed to someone already. Borrow failed"
-                            }
-                            return@withContext
+                    // 如果某本書已經借給某人，borrowedTo不是null，則代表這本書可能館員沒有刷還
+                    // 或者這個人是撿到這本書等等，須了解狀況後，再予以借書
+                    if (book.borrowedTo != null) {
+                        handler.post {
+                            borrow_return_result.text =
+                                "The book is borrowed to someone already. Borrow failed"
                         }
+                        return@post
+                    }
 
-                        if (user.bookBorrowing1 == null) {
-                            MainActivity.userDao!!.updateUsers(
-                                User(
-                                    user.id,
-                                    user.fullName,
-                                    isbn,
-                                    user.bookBorrowing2,
-                                    user.bookBorrowing3,
-                                    user.bookBorrowing4
-                                )
-                            )
-                        } else if (user.bookBorrowing2 == null) {
-                            MainActivity.userDao!!.updateUsers(
-                                User(
-                                    user.id,
-                                    user.fullName,
-                                    user.bookBorrowing1,
-                                    isbn,
-                                    user.bookBorrowing3,
-                                    user.bookBorrowing4
-                                )
-                            )
-                        } else if (user.bookBorrowing3 == null) {
-                            MainActivity.userDao!!.updateUsers(
-                                User(
-                                    user.id,
-                                    user.fullName,
-                                    user.bookBorrowing1,
-                                    user.bookBorrowing2,
-                                    isbn,
-                                    user.bookBorrowing4
-                                )
-                            )
-                        } else if (user.bookBorrowing4 == null) {
-                            MainActivity.userDao!!.updateUsers(
-                                User(
-                                    user.id,
-                                    user.fullName,
-                                    user.bookBorrowing1,
-                                    user.bookBorrowing2,
-                                    user.bookBorrowing3,
-                                    isbn
-                                )
-                            )
-                        }
-
-                        // 更新Book的borrowTo屬性
-                        MainActivity.bookDao!!.updateOneBook(
-                            Book(
-                                book.isbn,
-                                book.bookName,
-                                user.id
+                    if (user.bookBorrowing1 == null) {
+                        MainActivity.userDao!!.updateUsers(
+                            User(
+                                user.id,
+                                user.fullName,
+                                isbn,
+                                user.bookBorrowing2,
+                                user.bookBorrowing3,
+                                user.bookBorrowing4
                             )
                         )
-                        handler.post {
-                            borrow_return_result.text = "Borrow Success!!"
-                            bookISBN_for_borrow_return.setText("")
-                            userId_for_borrow_return.setText("")
-                        }
-                    } catch (e: Exception) {
-                        handler.post {
-                            borrow_return_result.text = e.message
-                        }
+                    } else if (user.bookBorrowing2 == null) {
+                        MainActivity.userDao!!.updateUsers(
+                            User(
+                                user.id,
+                                user.fullName,
+                                user.bookBorrowing1,
+                                isbn,
+                                user.bookBorrowing3,
+                                user.bookBorrowing4
+                            )
+                        )
+                    } else if (user.bookBorrowing3 == null) {
+                        MainActivity.userDao!!.updateUsers(
+                            User(
+                                user.id,
+                                user.fullName,
+                                user.bookBorrowing1,
+                                user.bookBorrowing2,
+                                isbn,
+                                user.bookBorrowing4
+                            )
+                        )
+                    } else if (user.bookBorrowing4 == null) {
+                        MainActivity.userDao!!.updateUsers(
+                            User(
+                                user.id,
+                                user.fullName,
+                                user.bookBorrowing1,
+                                user.bookBorrowing2,
+                                user.bookBorrowing3,
+                                isbn
+                            )
+                        )
+                    }
+
+                    // 更新Book的borrowTo屬性
+                    MainActivity.bookDao!!.updateOneBook(
+                        Book(
+                            book.isbn,
+                            book.bookName,
+                            user.id
+                        )
+                    )
+                    handler.post {
+                        borrow_return_result.text = "Borrow Success!!"
+                        bookISBN_for_borrow_return.setText("")
+                        userId_for_borrow_return.setText("")
+                    }
+                } catch (e: Exception) {
+                    handler.post {
+                        borrow_return_result.text = e.message
                     }
                 }
             }
+
         }
 
         returnBtn.setOnClickListener {
@@ -243,100 +237,97 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            runBlocking {
-                val scope = CoroutineScope(Dispatchers.Default)
-                withContext(scope.coroutineContext) {
-                    try {
-                        // 找尋使用者
-                        val user = MainActivity.userDao!!.getUserById(userID)
-                        if (user == null) {
-                            handler.post {
-                                borrow_return_result.text = "User not found. Return failed."
-                            }
-                            return@withContext
+            MainActivity.thread.myHandler!!.post {
+                try {
+                    // 找尋使用者
+                    val user = MainActivity.userDao!!.getUserById(userID)
+                    if (user == null) {
+                        handler.post {
+                            borrow_return_result.text = "User not found. Return failed."
                         }
+                        return@post
+                    }
 
-                        // 找尋圖書
-                        val book = MainActivity.bookDao!!.getBookByISBN(isbn)
-                        if (book == null) {
-                            handler.post {
-                                borrow_return_result.text = "Book not found. Return failed."
-                            }
-                            return@withContext
+                    // 找尋圖書
+                    val book = MainActivity.bookDao!!.getBookByISBN(isbn)
+                    if (book == null) {
+                        handler.post {
+                            borrow_return_result.text = "Book not found. Return failed."
                         }
+                        return@post
+                    }
 
-                        // 確認使用者有無借過此書
-                        if (user.bookBorrowing1 != isbn && user.bookBorrowing2 != isbn && user.bookBorrowing3 != isbn && user.bookBorrowing4 != isbn) {
-                            handler.post {
-                                borrow_return_result.text =
-                                    "User didn't borrow this book before. Return failed."
-                            }
-                            return@withContext
+                    // 確認使用者有無借過此書
+                    if (user.bookBorrowing1 != isbn && user.bookBorrowing2 != isbn && user.bookBorrowing3 != isbn && user.bookBorrowing4 != isbn) {
+                        handler.post {
+                            borrow_return_result.text =
+                                "User didn't borrow this book before. Return failed."
                         }
+                        return@post
+                    }
 
-                        if (user.bookBorrowing1 == isbn) {
-                            MainActivity.userDao!!.updateUsers(
-                                User(
-                                    user.id,
-                                    user.fullName,
-                                    null,
-                                    user.bookBorrowing2,
-                                    user.bookBorrowing3,
-                                    user.bookBorrowing4
-                                )
+                    if (user.bookBorrowing1 == isbn) {
+                        MainActivity.userDao!!.updateUsers(
+                            User(
+                                user.id,
+                                user.fullName,
+                                null,
+                                user.bookBorrowing2,
+                                user.bookBorrowing3,
+                                user.bookBorrowing4
                             )
-                        } else if (user.bookBorrowing2 == isbn) {
-                            MainActivity.userDao!!.updateUsers(
-                                User(
-                                    user.id,
-                                    user.fullName,
-                                    user.bookBorrowing1,
-                                    null,
-                                    user.bookBorrowing3,
-                                    user.bookBorrowing4
-                                )
+                        )
+                    } else if (user.bookBorrowing2 == isbn) {
+                        MainActivity.userDao!!.updateUsers(
+                            User(
+                                user.id,
+                                user.fullName,
+                                user.bookBorrowing1,
+                                null,
+                                user.bookBorrowing3,
+                                user.bookBorrowing4
                             )
-                        } else if (user.bookBorrowing3 == isbn) {
-                            MainActivity.userDao!!.updateUsers(
-                                User(
-                                    user.id,
-                                    user.fullName,
-                                    user.bookBorrowing1,
-                                    user.bookBorrowing2,
-                                    null,
-                                    user.bookBorrowing4
-                                )
+                        )
+                    } else if (user.bookBorrowing3 == isbn) {
+                        MainActivity.userDao!!.updateUsers(
+                            User(
+                                user.id,
+                                user.fullName,
+                                user.bookBorrowing1,
+                                user.bookBorrowing2,
+                                null,
+                                user.bookBorrowing4
                             )
-                        } else if (user.bookBorrowing4 == isbn) {
-                            MainActivity.userDao!!.updateUsers(
-                                User(
-                                    user.id,
-                                    user.fullName,
-                                    user.bookBorrowing1,
-                                    user.bookBorrowing2,
-                                    user.bookBorrowing3,
-                                    null
-                                )
-                            )
-                        }
-
-                        // 更新Book的borrowTo屬性
-                        MainActivity.bookDao!!.updateOneBook(
-                            Book(
-                                book.isbn,
-                                book.bookName,
+                        )
+                    } else if (user.bookBorrowing4 == isbn) {
+                        MainActivity.userDao!!.updateUsers(
+                            User(
+                                user.id,
+                                user.fullName,
+                                user.bookBorrowing1,
+                                user.bookBorrowing2,
+                                user.bookBorrowing3,
                                 null
                             )
                         )
-                        handler.post {
-                            borrow_return_result.text = "Return Success!!"
-                            bookISBN_for_borrow_return.setText("")
-                            userId_for_borrow_return.setText("")
-                        }
-                    } catch (e: Exception) {
-                        handler.post {
-                            borrow_return_result.text = e.message
-                        }
+                    }
+
+                    // 更新Book的borrowTo屬性
+                    MainActivity.bookDao!!.updateOneBook(
+                        Book(
+                            book.isbn,
+                            book.bookName,
+                            null
+                        )
+                    )
+                    handler.post {
+                        borrow_return_result.text = "Return Success!!"
+                        bookISBN_for_borrow_return.setText("")
+                        userId_for_borrow_return.setText("")
+                    }
+                } catch (e: Exception) {
+                    handler.post {
+                        borrow_return_result.text = e.message
                     }
                 }
             }

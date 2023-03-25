@@ -9,6 +9,8 @@ import com.wilsontryingapp2023.libraryservice.R
 import com.wilsontryingapp2023.libraryservice.roomDatabase.AppDatabase
 import com.wilsontryingapp2023.libraryservice.roomDatabase.BookDao
 import com.wilsontryingapp2023.libraryservice.roomDatabase.UserDao
+import com.wilsontryingapp2023.libraryservice.thread.LooperThread
+import java.util.concurrent.CountDownLatch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var btn1: Button
@@ -19,6 +21,8 @@ class MainActivity : AppCompatActivity() {
     companion object {
         var userDao: UserDao? = null
         var bookDao: BookDao? = null
+        val countDown = CountDownLatch(1)
+        val thread : LooperThread = LooperThread(countDown)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +33,16 @@ class MainActivity : AppCompatActivity() {
         btn2 = findViewById(R.id.register_user_Btn)
         btn3 = findViewById(R.id.borrow_return_Btn)
         btn4 = findViewById(R.id.data_query_Btn)
+
+        thread.start()
+
+        try {
+            // 在LooperThread完成myHandler製作之前，都需要等待
+            countDown.await()
+        } catch (e: InterruptedException) {
+            // Handle any exceptions that may occur
+            e.printStackTrace()
+        }
 
         btn1.setOnClickListener {
             startActivity(Intent(this, BookRegisterActivity::class.java))

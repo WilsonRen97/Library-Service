@@ -100,22 +100,19 @@ class BookRegisterActivity : AppCompatActivity() {
             }
 
 
-            runBlocking {
-                val scope = CoroutineScope(Dispatchers.Default)
-                withContext(scope.coroutineContext) {
-                    try {
-                        val bookTitle = bookName.text.toString()
-                        val bookISBNEntry = bookISBN.text.toString()
-                        MainActivity.bookDao!!.insertOneNewBook(Book(bookISBNEntry, bookTitle, null))
-                        handler.post{
-                            bookRegisterResult.text = "The result is :\n Congrads!! The book has been registered."
-                            bookName.setText("")
-                            bookISBN.setText("")
-                        }
-                    } catch (e : Exception) {
-                        handler.post{
-                            bookRegisterResult.text = "The result is :\n" + e.message
-                        }
+            MainActivity.thread.myHandler!!.post {
+                try {
+                    val bookTitle = bookName.text.toString()
+                    val bookISBNEntry = bookISBN.text.toString()
+                    MainActivity.bookDao!!.insertOneNewBook(Book(bookISBNEntry, bookTitle, null))
+                    handler.post{
+                        bookRegisterResult.text = "The result is :\n Congrads!! The book has been registered."
+                        bookName.setText("")
+                        bookISBN.setText("")
+                    }
+                } catch (e : Exception) {
+                    handler.post{
+                        bookRegisterResult.text = "The result is :\n" + e.message
                     }
                 }
             }
