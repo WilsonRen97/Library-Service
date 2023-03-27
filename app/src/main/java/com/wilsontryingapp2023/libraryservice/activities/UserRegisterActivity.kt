@@ -116,7 +116,7 @@ class UserRegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            MainActivity.thread.myHandler!!.post {
+            Thread {
                 try {
                     val userNameRegister = userName.text.toString()
                     val userIDRegister = userID.text.toString()
@@ -141,8 +141,7 @@ class UserRegisterActivity : AppCompatActivity() {
                         userRegisterResult.text = "The result is :\n" + e.message
                     }
                 }
-            }
-
+            }.start()
         }
     }
 }

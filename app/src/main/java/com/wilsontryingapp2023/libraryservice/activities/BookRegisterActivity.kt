@@ -10,10 +10,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.wilsontryingapp2023.libraryservice.R
 import com.wilsontryingapp2023.libraryservice.roomDatabase.Book
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 class BookRegisterActivity : AppCompatActivity() {
 
@@ -99,14 +95,13 @@ class BookRegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-
-            MainActivity.thread.myHandler!!.post {
+            Thread {
                 try {
                     val bookTitle = bookName.text.toString()
                     val bookISBNEntry = bookISBN.text.toString()
                     MainActivity.bookDao!!.insertOneNewBook(Book(bookISBNEntry, bookTitle, null))
                     handler.post{
-                        bookRegisterResult.text = "The result is :\n Congrads!! The book has been registered."
+                        bookRegisterResult.text = "The result is :\n Congrats!! The book has been registered."
                         bookName.setText("")
                         bookISBN.setText("")
                     }
@@ -115,7 +110,7 @@ class BookRegisterActivity : AppCompatActivity() {
                         bookRegisterResult.text = "The result is :\n" + e.message
                     }
                 }
-            }
+            }.start()
         }
     }
 }

@@ -121,7 +121,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            MainActivity.thread.myHandler!!.post {
+            Thread {
                 try {
                     // 找尋使用者
                     val user = MainActivity.userDao!!.getUserById(userID)
@@ -130,7 +130,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                         handler.post {
                             borrow_return_result.text = "User not found. Borrow failed."
                         }
-                        return@post
+                        return@Thread
                     }
 
                     // 找尋圖書
@@ -139,7 +139,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                         handler.post {
                             borrow_return_result.text = "Book not found. Borrow failed."
                         }
-                        return@post
+                        return@Thread
                     }
 
                     // 如果使用者已經借了四本書，則不予以借書
@@ -148,7 +148,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                             borrow_return_result.text =
                                 "User have reach the book borrow limit. Borrow failed."
                         }
-                        return@post
+                        return@Thread
                     }
 
                     // 如果某本書已經借給某人，borrowedTo不是null，則代表這本書可能館員沒有刷還
@@ -158,7 +158,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                             borrow_return_result.text =
                                 "The book is borrowed to someone already. Borrow failed"
                         }
-                        return@post
+                        return@Thread
                     }
 
                     if (user.bookBorrowing1 == null) {
@@ -226,7 +226,6 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                     }
                 }
             }
-
         }
 
         returnBtn.setOnClickListener {
@@ -237,7 +236,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            MainActivity.thread.myHandler!!.post {
+            Thread {
                 try {
                     // 找尋使用者
                     val user = MainActivity.userDao!!.getUserById(userID)
@@ -245,7 +244,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                         handler.post {
                             borrow_return_result.text = "User not found. Return failed."
                         }
-                        return@post
+                        return@Thread
                     }
 
                     // 找尋圖書
@@ -254,7 +253,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                         handler.post {
                             borrow_return_result.text = "Book not found. Return failed."
                         }
-                        return@post
+                        return@Thread
                     }
 
                     // 確認使用者有無借過此書
@@ -263,7 +262,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                             borrow_return_result.text =
                                 "User didn't borrow this book before. Return failed."
                         }
-                        return@post
+                        return@Thread
                     }
 
                     if (user.bookBorrowing1 == isbn) {

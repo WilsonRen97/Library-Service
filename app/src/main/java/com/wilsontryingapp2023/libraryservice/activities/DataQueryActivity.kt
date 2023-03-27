@@ -33,7 +33,7 @@ class DataQueryActivity : AppCompatActivity() {
         findAllBookBtn = findViewById(R.id.findAllBookBtn)
 
         findAllBookBtn.setOnClickListener{
-            MainActivity.thread.myHandler!!.post {
+            Thread {
                 var result = ""
                 var books = MainActivity.bookDao!!.getAllBooks()
                 for (book in books) {
@@ -46,11 +46,11 @@ class DataQueryActivity : AppCompatActivity() {
                 handler.post{
                     data_query_result.text = "The result is :\n${result}"
                 }
-            }
+            }.start()
         }
 
         findAllUserBtn.setOnClickListener{
-            MainActivity.thread.myHandler!!.post {
+            Thread {
                 var result = ""
                 var users = MainActivity.userDao!!.getAllUsers()
                 for (user in users) {
@@ -75,7 +75,7 @@ class DataQueryActivity : AppCompatActivity() {
                 handler.post{
                     data_query_result.text = "The result is :\n${result}"
                 }
-            }
+            }.start()
         }
 
 
@@ -88,7 +88,7 @@ class DataQueryActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            MainActivity.thread.myHandler!!.post {
+            Thread {
                 try {
                     var result = ""
                     // 使用者提供的是身分證字號，所以要查詢使用者資訊
@@ -134,7 +134,7 @@ class DataQueryActivity : AppCompatActivity() {
                         data_query_result.text = "The result is :\n" + e.message
                     }
                 }
-            }
+            }.start()
         }
     }
 }
