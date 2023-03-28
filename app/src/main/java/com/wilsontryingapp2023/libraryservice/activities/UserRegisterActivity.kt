@@ -17,7 +17,7 @@ class UserRegisterActivity : AppCompatActivity() {
     private lateinit var userID: EditText
     private lateinit var userRegisterBtn: Button
     private lateinit var userRegisterResult: TextView
-    private var handler: Handler = Handler(Looper.myLooper()!!)
+    private var handler: Handler = Handler(Looper.getMainLooper()!!)
 
     companion object {
         fun validationCheckForID(id: String): Boolean {

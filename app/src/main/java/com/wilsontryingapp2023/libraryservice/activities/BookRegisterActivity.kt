@@ -17,7 +17,7 @@ class BookRegisterActivity : AppCompatActivity() {
     private lateinit var bookISBN: EditText
     private lateinit var bookRegisterBtn: Button
     private lateinit var bookRegisterResult : TextView
-    private var handler : Handler = Handler(Looper.myLooper()!!)
+    private var handler : Handler = Handler(Looper.getMainLooper()!!)
 
     companion object {
         fun validationCheckForISBN(isbn: String): Boolean {

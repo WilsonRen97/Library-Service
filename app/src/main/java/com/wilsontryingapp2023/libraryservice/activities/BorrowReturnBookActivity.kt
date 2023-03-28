@@ -19,7 +19,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
     private lateinit var borrowBtn: Button
     private lateinit var returnBtn: Button
     private lateinit var borrow_return_result: TextView
-    private var handler : Handler = Handler(Looper.myLooper()!!)
+    private var handler : Handler = Handler(Looper.getMainLooper()!!)
 
     private fun dataCheck(isbn: String, userID: String): Boolean {
         val ab: AlertDialog.Builder = AlertDialog.Builder(this)
@@ -225,7 +225,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                         borrow_return_result.text = e.message
                     }
                 }
-            }
+            }.start()
         }
 
         returnBtn.setOnClickListener {
@@ -329,7 +329,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                         borrow_return_result.text = e.message
                     }
                 }
-            }
+            }.start()
         }
     }
 }

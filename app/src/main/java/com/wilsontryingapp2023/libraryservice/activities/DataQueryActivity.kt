@@ -20,7 +20,7 @@ class DataQueryActivity : AppCompatActivity() {
     private lateinit var findAllUserBtn : Button
     private lateinit var findAllBookBtn : Button
     private lateinit var data_query_result : TextView
-    private var handler : Handler = Handler(Looper.myLooper()!!)
+    private var handler : Handler = Handler(Looper.getMainLooper()!!)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
