@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.wilsontryingapp2023.libraryservice.R
 import com.wilsontryingapp2023.libraryservice.roomDatabase.Book
+import java.util.concurrent.Executors
 
 class BookRegisterActivity : AppCompatActivity() {
 
@@ -18,6 +19,7 @@ class BookRegisterActivity : AppCompatActivity() {
     private lateinit var bookRegisterBtn: Button
     private lateinit var bookRegisterResult : TextView
     private var handler : Handler = Handler(Looper.getMainLooper()!!)
+    private var singleThreadExecutors = Executors.newSingleThreadExecutor()
 
     companion object {
         fun validationCheckForISBN(isbn: String): Boolean {
@@ -95,7 +97,7 @@ class BookRegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            Thread {
+            singleThreadExecutors.execute{
                 try {
                     val bookTitle = bookName.text.toString()
                     val bookISBNEntry = bookISBN.text.toString()
@@ -110,7 +112,7 @@ class BookRegisterActivity : AppCompatActivity() {
                         bookRegisterResult.text = "The result is :\n" + e.message
                     }
                 }
-            }.start()
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.wilsontryingapp2023.libraryservice.R
 import com.wilsontryingapp2023.libraryservice.roomDatabase.Book
 import com.wilsontryingapp2023.libraryservice.roomDatabase.User
+import java.util.concurrent.Executors
 
 class BorrowReturnBookActivity : AppCompatActivity() {
 
@@ -20,6 +21,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
     private lateinit var returnBtn: Button
     private lateinit var borrow_return_result: TextView
     private var handler : Handler = Handler(Looper.getMainLooper()!!)
+    private var singleThreadExecutors = Executors.newSingleThreadExecutor()
 
     private fun dataCheck(isbn: String, userID: String): Boolean {
         val ab: AlertDialog.Builder = AlertDialog.Builder(this)
@@ -121,7 +123,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            Thread {
+            singleThreadExecutors.execute {
                 try {
                     // 找尋使用者
                     val user = MainActivity.userDao!!.getUserById(userID)
@@ -130,7 +132,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                         handler.post {
                             borrow_return_result.text = "User not found. Borrow failed."
                         }
-                        return@Thread
+                        return@execute
                     }
 
                     // 找尋圖書
@@ -139,7 +141,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                         handler.post {
                             borrow_return_result.text = "Book not found. Borrow failed."
                         }
-                        return@Thread
+                        return@execute
                     }
 
                     // 如果使用者已經借了四本書，則不予以借書
@@ -148,7 +150,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                             borrow_return_result.text =
                                 "User have reach the book borrow limit. Borrow failed."
                         }
-                        return@Thread
+                        return@execute
                     }
 
                     // 如果某本書已經借給某人，borrowedTo不是null，則代表這本書可能館員沒有刷還
@@ -158,7 +160,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                             borrow_return_result.text =
                                 "The book is borrowed to someone already. Borrow failed"
                         }
-                        return@Thread
+                        return@execute
                     }
 
                     if (user.bookBorrowing1 == null) {
@@ -225,7 +227,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                         borrow_return_result.text = e.message
                     }
                 }
-            }.start()
+            }
         }
 
         returnBtn.setOnClickListener {
@@ -236,7 +238,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            Thread {
+            singleThreadExecutors.execute {
                 try {
                     // 找尋使用者
                     val user = MainActivity.userDao!!.getUserById(userID)
@@ -244,7 +246,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                         handler.post {
                             borrow_return_result.text = "User not found. Return failed."
                         }
-                        return@Thread
+                        return@execute
                     }
 
                     // 找尋圖書
@@ -253,7 +255,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                         handler.post {
                             borrow_return_result.text = "Book not found. Return failed."
                         }
-                        return@Thread
+                        return@execute
                     }
 
                     // 確認使用者有無借過此書
@@ -262,7 +264,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                             borrow_return_result.text =
                                 "User didn't borrow this book before. Return failed."
                         }
-                        return@Thread
+                        return@execute
                     }
 
                     if (user.bookBorrowing1 == isbn) {
@@ -329,7 +331,7 @@ class BorrowReturnBookActivity : AppCompatActivity() {
                         borrow_return_result.text = e.message
                     }
                 }
-            }.start()
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.wilsontryingapp2023.libraryservice.R
 import com.wilsontryingapp2023.libraryservice.roomDatabase.User
+import java.util.concurrent.Executors
 
 class UserRegisterActivity : AppCompatActivity() {
 
@@ -18,6 +19,7 @@ class UserRegisterActivity : AppCompatActivity() {
     private lateinit var userRegisterBtn: Button
     private lateinit var userRegisterResult: TextView
     private var handler: Handler = Handler(Looper.getMainLooper()!!)
+    private var singleThreadExecutors = Executors.newSingleThreadExecutor()
 
     companion object {
         fun validationCheckForID(id: String): Boolean {
@@ -116,7 +118,7 @@ class UserRegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            Thread {
+            singleThreadExecutors.execute{
                 try {
                     val userNameRegister = userName.text.toString()
                     val userIDRegister = userID.text.toString()
@@ -141,7 +143,7 @@ class UserRegisterActivity : AppCompatActivity() {
                         userRegisterResult.text = "The result is :\n" + e.message
                     }
                 }
-            }.start()
+            }
         }
     }
 }

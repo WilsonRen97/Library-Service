@@ -12,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import java.util.concurrent.Executors
 
 class DataQueryActivity : AppCompatActivity() {
 
@@ -21,6 +22,7 @@ class DataQueryActivity : AppCompatActivity() {
     private lateinit var findAllBookBtn : Button
     private lateinit var data_query_result : TextView
     private var handler : Handler = Handler(Looper.getMainLooper()!!)
+    private var singleThreadExecutors = Executors.newSingleThreadExecutor()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,24 +35,24 @@ class DataQueryActivity : AppCompatActivity() {
         findAllBookBtn = findViewById(R.id.findAllBookBtn)
 
         findAllBookBtn.setOnClickListener{
-            Thread {
+            singleThreadExecutors.execute{
                 var result = ""
                 var books = MainActivity.bookDao!!.getAllBooks()
                 for (book in books) {
                     result += "Book name is ${book.bookName}\n"
                     result += "Book ISBN is ${book.isbn}\n"
                     result += "Book is now borrowed to ${book.borrowedTo}\n"
-                    result += "========================="
+                    result += "=========================\n"
                 }
 
                 handler.post{
                     data_query_result.text = "The result is :\n${result}"
                 }
-            }.start()
+            }
         }
 
         findAllUserBtn.setOnClickListener{
-            Thread {
+            singleThreadExecutors.execute{
                 var result = ""
                 var users = MainActivity.userDao!!.getAllUsers()
                 for (user in users) {
@@ -75,7 +77,7 @@ class DataQueryActivity : AppCompatActivity() {
                 handler.post{
                     data_query_result.text = "The result is :\n${result}"
                 }
-            }.start()
+            }
         }
 
 
@@ -88,7 +90,7 @@ class DataQueryActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            Thread {
+            singleThreadExecutors.execute{
                 try {
                     var result = ""
                     // 使用者提供的是身分證字號，所以要查詢使用者資訊
@@ -134,7 +136,7 @@ class DataQueryActivity : AppCompatActivity() {
                         data_query_result.text = "The result is :\n" + e.message
                     }
                 }
-            }.start()
+            }
         }
     }
 }
